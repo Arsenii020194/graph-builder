@@ -1,0 +1,12 @@
+.settings_bar label {
+  padding-right: 0.5em;
+}
+
+.settings_bar > input {
+  width: 3em;
+  margin-right: 0.5em;
+}
+
+.settings_bar{
+
+}
