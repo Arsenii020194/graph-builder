@@ -8,6 +8,14 @@ export default class Graph extends React.Component {
   }
 
   componentDidMount() {
+    this.buildGraph()
+  }
+
+  componentDidUpdate() {
+    this.buildGraph()
+  }
+
+  buildGraph() {
     let i;
     const canvas1 = this.refs.canvas
     let context = canvas1.getContext("2d");
@@ -15,15 +23,11 @@ export default class Graph extends React.Component {
     context.lineJoin = "round";
     context.strokeStyle = "black";
     context.moveTo(0, canvas1.height);
-
     let data = this.props.data
     for (i = 1; i < data.length; i++) {
       context.lineTo(data[i].x, canvas1.height - data[i].y);
     }
     context.stroke();
-  }
-
-  componentDidUpdate() {
   }
 
   render() {

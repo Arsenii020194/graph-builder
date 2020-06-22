@@ -19,11 +19,21 @@ export default class App extends React.Component {
       varName: state.var
     }
     let paramsStr = ''
-    for (let key in params){
-      paramsStr += key+'='+params[key] + '&'
+    for (let key in params) {
+      paramsStr += key + '=' + params[key] + '&'
     }
-    fetch("http://localhost:8080/v1/graph-data?")
-    .then(res => this.setState({...this.state, data: res}))
+
+    fetch("http://localhost:8080/v1/graph-data?" + paramsStr)
+    .then(res => res.json())
+    .then(
+        (result) => {
+          this.setState({...this.state, data: result})
+        },
+
+        (error) => {
+          console.log(error)
+        }
+    )
   }
 
   render = () => {

@@ -8,11 +8,11 @@ export default class SettingsBar extends React.Component {
   }
 
   onFromRangeInput(event) {
-    this.setState({...this.state, from: event.data})
+    this.setState({...this.state, from: event.target.value})
   }
 
   onToRangeInput(event) {
-    this.setState({...this.state, to: event.data})
+    this.setState({...this.state, to: event.target.value})
   }
 
   constructor(props) {
@@ -22,7 +22,11 @@ export default class SettingsBar extends React.Component {
   }
 
   returnState() {
-    let combinedState = {...this.state}
+    let combinedState = {
+      from: this.state.from, to: this.state.to,
+      str: this.props.str, strToApi: this.props.strToApi,
+      var: 'x'
+    }
     this.props.onClickSend(combinedState)
   }
 
@@ -30,11 +34,12 @@ export default class SettingsBar extends React.Component {
     return (
         <div className={css.settings_bar}>
           <label>range from:</label>
-          <input onInput={this.onFromRangeInput.bind(this)} type={"number"}/>
+          <input onChange={this.onFromRangeInput.bind(this)} type={"number"}/>
           <label>range to:</label>
-          <input onInput={this.onToRangeInput.bind(this)} type="number"/>
+          <input onChange={this.onToRangeInput.bind(this)} type="number"/>
           <label>variable name:</label>
-          <input onInput={this.onVarNameInput.bind(this)} type="text"
+          <input disabled={true} onChange={this.onVarNameInput.bind(this)}
+                 type="text"
                  maxLength={1} value={this.props.var}/>
           <button onClick={this.returnState.bind(this)}>BUILD
           </button>
