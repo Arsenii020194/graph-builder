@@ -1,28 +1,39 @@
 import * as React from "react";
 import Graph from "../src/components/Graph";
 import ExpressionBar from "./components/ExpressionBar";
-import { createStore } from "redux";
-import reducer from "./reducers/App";
-import Button from "./components/Button";
 
 export default class App extends React.Component {
   constructor(props) {
-    const store = createStore(reducer);
     super(props);
     this.state = {
-      colors: []
-    };
+      data: []
+    }
+  }
+
+  onClickSend = (state) => {
+    let params = {
+      from: state.from,
+      to: state.to,
+      expression: state.strToApi,
+      scale: 1,
+      varName: state.var
+    }
+    let paramsStr = ''
+    for (let key in params){
+      paramsStr += key+'='+params[key] + '&'
+    }
+    fetch("http://localhost:8080/v1/graph-data?")
+    .then(res => this.setState({...this.state, data: res}))
   }
 
   render = () => {
     return (
         <div className="app">
-          <Button></Button>
           <div>
-            <ExpressionBar/>
+            <ExpressionBar onClickSend={this.onClickSend.bind(this)}/>
           </div>
           <div>
-            <Graph/>
+            <Graph data={this.state.data}/>
           </div>
         </div>
     );

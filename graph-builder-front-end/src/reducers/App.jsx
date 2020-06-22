@@ -1,12 +1,9 @@
 const reducer = (state = {}, action) => {
-  debugger
   switch (action.type) {
-    case 'HELLO_REACT':
-      return { ...state, say : 'Hello World Redux'  };
+//todo: var of builder should be here and swich api(Wolfram alpha or v1)
     default:
       return state;
   }
-
 };
 
 export default reducer;

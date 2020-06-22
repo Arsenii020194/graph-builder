@@ -26,5 +26,9 @@ export default class ValidatorFactory {
     if (consts.POW === symbol){
       return new DotValidator()
     }
+    var letters = /^[A-Za-z]+$/;
+    if (symbol.match(letters)){
+      return new DigitValidator()
+    }
   }
 }

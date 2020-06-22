@@ -13,64 +13,98 @@ import {
 import SettingsBar from "./SettingsBar";
 
 export default class ExpressionBar extends React.Component {
-  str = ''
-  strToApi = ''
-  prevSymbol = ''
-  prevDigit = ''
-  isPov = false
 
   constructor(props) {
     super(props);
+    this.state = {
+      str: '',
+      strToApi: '',
+      prevSymbol: '',
+      prevDigit: '',
+      isPov: false,
+      var: 'x'
+    }
+  }
+
+  onVarChange(variable) {
+    this.setState({
+      ...this.state,
+      var: variable
+    })
   }
 
   onBeforeInput(event) {
+    let {
+      str,
+      strToApi,
+      prevSymbol,
+      prevDigit,
+      isPov
+    } = this.state
+
     let symbol = event.data
     let validator = ValidatorFactory.getValidator(symbol)
+
     if (!validator) {
       event.preventDefault()
       return
     }
-    debugger
+
     let validationResult = validator.isValid(
-        this.prevSymbol, this.prevDigit, this.str)
+        prevSymbol, prevDigit, str)
     if (!validationResult) {
       event.preventDefault()
     } else {
-      this.prevSymbol = symbol
-
+      prevSymbol = symbol
       if (DIGITS.includes(symbol) || symbol === DOT) {
-        this.prevDigit += symbol
-        this.strToApi += symbol
+        strToApi = strToApi + symbol
+        prevDigit = prevDigit + symbol
       } else if (symbol === POW) {
-        this.strToApi = this.strToApi.slice(0, this.strToApi.length - this.prevDigit.length)
-        this.strToApi += 'Math.pow(' + this.prevDigit + ','
-        this.prevDigit = ''
-        this.isPov = true
+        let strToApiSliced = strToApi.slice(0,
+            strToApi.length - this.state.prevDigit.length)
+        strToApi = strToApiSliced + 'Math.pow(' + prevDigit + ','
+        prevDigit = ''
+        isPov = true
       } else if (SIGNS.includes(symbol) || symbol === CLOSING_BRACKET || symbol
           === OPENING_BRACKET) {
         if (this.isPov) {
-          this.strToApi += ')'
-          this.strToApi += symbol
-          this.isPov = false
+          strToApi = strToApi + ')' + symbol
+          isPov = false
         } else {
-          this.strToApi += symbol
+          strToApi = strToApi + symbol
+          prevDigit = ''
         }
-        this.prevDigit = ''
       } else {
-        this.strToApi += symbol
+        strToApi = strToApi + symbol
       }
-      this.str += symbol
+      str = str + symbol
     }
+
+    this.setState({
+      str: str,
+      strToApi: strToApi,
+      prevSymbol: prevSymbol,
+      prevDigit: prevDigit,
+      isPov: isPov
+    })
   }
 
   onKeyUp(event) {
     if (event && event.keyCode === 8) {
-      if (this.prevSymbol) {
-        this.prevSymbol = this.prevDigit.charAt(this.prevDigit.length - 2)
+      let {
+        prevSymbol,
+        prevDigit
+      } = this.state
+      if (prevSymbol) {
+        prevSymbol = prevDigit.charAt(prevDigit.length - 2)
       }
-      if (this.prevDigit) {
-        this.prevDigit = this.prevDigit.slice(0, this.prevDigit.length - 2)
+      if (prevDigit) {
+        prevDigit = prevDigit.charAt(prevDigit.length - 2)
       }
+      this.setState({
+        prevSymbol: prevSymbol,
+        prevDigit: prevDigit
+      })
     }
   }
 
@@ -80,22 +114,18 @@ export default class ExpressionBar extends React.Component {
     }
   }
 
-  onClickSend() {
-    if (DIGITS.includes(this.prevSymbol) && this.isPov) {
-      this.strToApi += ')'
-    }
-    console.log(this.strToApi)
-  }
-
   render() {
     return (
         <div>
           <input type="text"
-                 className={css.calculator__display + ' ' + cssParent.fit_parent_div}
+                 className={css.calculator__display + ' '
+                 + cssParent.fit_parent_div}
                  onKeyUp={this.onKeyUp.bind(this)}
                  onKeyDown={this.onKeyDown.bind(this)}
                  onBeforeInput={this.onBeforeInput.bind(this)}/>
-          <SettingsBar onClickSend={this.onClickSend.bind(this)}/>
+          <SettingsBar {...this.state}
+                       onVarChange={this.onVarChange.bind(this)}
+                       onClickSend={this.props.onClickSend}/>
         </div>
     )
   }

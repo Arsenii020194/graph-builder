@@ -15,9 +15,10 @@ export default class Graph extends React.Component {
     context.lineJoin = "round";
     context.strokeStyle = "black";
     context.moveTo(0, canvas1.height);
-    for (i = 1; i < 100; i++) {
-      debugger
-      context.lineTo(i, canvas1.height - i);
+
+    let data = this.props.data
+    for (i = 1; i < data.length; i++) {
+      context.lineTo(data[i].x, canvas1.height - data[i].y);
     }
     context.stroke();
   }
