@@ -16,7 +16,7 @@ export default class App extends React.Component {
     this.setState({...this.state, data:[]})
     let params = {...state}
     for (let key in params) {
-      if (!params[key]) {
+      if (params.hasOwnProperty(key) && !params[key]) {
         store.addNotification({
           title: 'Error',
           message: "all settings must be set!",
