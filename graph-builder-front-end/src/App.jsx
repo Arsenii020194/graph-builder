@@ -1,6 +1,8 @@
 import * as React from "react";
 import Graph from "../src/components/Graph";
-import ExpressionBar from "./components/ExpressionBar";
+import SettingsBar from "./components/SettingsBar";
+import ReactNotifications from 'react-notifications-component';
+import { store } from 'react-notifications-component';
 
 export default class App extends React.Component {
   constructor(props) {
@@ -11,27 +13,32 @@ export default class App extends React.Component {
   }
 
   onClickSend = (state) => {
-    let params = {
-      from: state.from,
-      to: state.to,
-      expression: state.strToApi,
-      scale: 1,
-      varName: state.var
-    }
-    let paramsStr = ''
-    for (let key in params) {
-      paramsStr += key + '=' + params[key] + '&'
-    }
-
-    fetch("http://localhost:8080/v1/graph-data?" + paramsStr)
+    this.setState({...this.state, data:[]})
+    let params = {...state}
+    const requestOptions = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(params)
+    };
+    fetch("http://localhost:8080/v1/graph-data",requestOptions)
     .then(res => res.json())
     .then(
         (result) => {
-          this.setState({...this.state, data: result})
-        },
-
-        (error) => {
-          console.log(error)
+          if (result.error){
+            store.addNotification({
+              title: 'Error',
+              message: result.error,
+              type: 'default',                         // 'default', 'success', 'info', 'warning'
+              container: 'bottom-left',                // where to position the notifications
+              animationIn: ["animated", "fadeIn"],     // animate.css classes that's applied
+              animationOut: ["animated", "fadeOut"],   // animate.css classes that's applied
+              dismiss: {
+                duration: 2000
+              }
+            })
+          } else {
+            this.setState({...this.state, data: result})
+          }
         }
     )
   }
@@ -39,8 +46,9 @@ export default class App extends React.Component {
   render = () => {
     return (
         <div className="app">
+          <ReactNotifications />
           <div>
-            <ExpressionBar onClickSend={this.onClickSend.bind(this)}/>
+            <SettingsBar onClickSend={this.onClickSend}/>
           </div>
           <div>
             <Graph data={this.state.data}/>

@@ -7,6 +7,20 @@ export default class Graph extends React.Component {
     super(props);
   }
 
+  drawAxis = (context, canvas) => {
+    context.beginPath();
+    context.strokeStyle = "#000000";
+    context.lineWidth = 1;
+    context.moveTo(canvas.width / 2 + 0.5, 0.5);
+    context.lineTo(canvas.width / 2 + 0.5, canvas.height + 0.5);
+    context.stroke();
+
+    context.beginPath();
+    context.moveTo(0, (canvas.height / 2) + 0.5);
+    context.lineTo(canvas.width, (canvas.height / 2) + 0.5);
+    context.stroke();
+  }
+
   componentDidMount() {
     this.buildGraph()
   }
@@ -17,17 +31,23 @@ export default class Graph extends React.Component {
 
   buildGraph() {
     let i;
-    const canvas1 = this.refs.canvas
-    let context = canvas1.getContext("2d");
+    const canvas = this.refs.canvas
+    let context = canvas.getContext("2d");
+    context.clearRect(0, 0, canvas.width, canvas.height)
+    this.drawAxis(context, canvas)
     context.beginPath();
     context.lineJoin = "round";
     context.strokeStyle = "black";
-    context.moveTo(0, canvas1.height);
     let data = this.props.data
-    for (i = 1; i < data.length; i++) {
-      context.lineTo(data[i].x, canvas1.height - data[i].y);
+    if (data && data.length > 0) {
+      context.moveTo((data[0].x + canvas.width / 2) + 0.5,
+          (canvas.height / 2 - data[0].y) + 0.5);
+      for (i = 1; i < data.length; i++) {
+        context.lineTo((data[i].x + canvas.width / 2) + 0.5,
+            (canvas.height / 2 - data[i].y) + 0.5);
+        context.stroke();
+      }
     }
-    context.stroke();
   }
 
   render() {

@@ -1,47 +1,59 @@
 import * as React from "react";
 import * as css from "../css/settings.module.css";
+import ExpressionBar from "./ExpressionBar";
 
 export default class SettingsBar extends React.Component {
-
-  onVarNameInput(event) {
-    this.setState({...this.state, varName: event.data})
+  constructor(props) {
+    super(props);
+    this.state = {
+      from: '',
+      to: '',
+      expression: '',
+      varName: 'x',
+      step: 0
+    }
   }
 
-  onFromRangeInput(event) {
+  onVarNameInput = (event) => {
+    this.setState({...this.state, varName: event.target.value})
+  }
+
+  onFromRangeInput = (event) => {
     this.setState({...this.state, from: event.target.value})
   }
 
-  onToRangeInput(event) {
+  onToRangeInput = (event) => {
     this.setState({...this.state, to: event.target.value})
   }
 
-  constructor(props) {
-    super(props);
-    const {str, strToApi} = this.props
-    this.state = {str: str, strToApi: strToApi}
+  onStepInput = (event) => {
+    this.setState({...this.state, step: event.target.value})
   }
 
-  returnState() {
-    let combinedState = {
-      from: this.state.from, to: this.state.to,
-      str: this.props.str, strToApi: this.props.strToApi,
-      var: 'x'
-    }
-    this.props.onClickSend(combinedState)
+  returnState = () => {
+    this.props.onClickSend({...this.state})
+  }
+
+  setExpression = (expression) => {
+    this.setState({...this.state, expression: expression})
   }
 
   render() {
     return (
         <div className={css.settings_bar}>
-          <label>range from:</label>
-          <input onChange={this.onFromRangeInput.bind(this)} type={"number"}/>
-          <label>range to:</label>
-          <input onChange={this.onToRangeInput.bind(this)} type="number"/>
+          <ExpressionBar {...this.state} setExpression={this.setExpression}/>
+          <label>from:</label>
+          <input onChange={this.onFromRangeInput} type={"number"}/>
+          <label>to:</label>
+          <input onChange={this.onToRangeInput} type="number"/>
+          <label>step:</label>
+          <input onChange={this.onStepInput} value={this.state.step}
+                 type="number"/>
           <label>variable name:</label>
-          <input disabled={true} onChange={this.onVarNameInput.bind(this)}
+          <input onChange={this.onVarNameInput}
                  type="text"
-                 maxLength={1} value={this.props.var}/>
-          <button onClick={this.returnState.bind(this)}>BUILD
+                 maxLength={1} value={this.state.varName}/>
+          <button onClick={this.returnState}>BUILD
           </button>
         </div>)
   }

@@ -11,7 +11,7 @@ import kotlin.collections.set
 
 
 @Service
-class PlainGraphService : GraphService {
+class PlainGraphService(val powTranspiler: Transpiler) : GraphService {
 
     override fun getGraphData(params: GraphParams): List<PointDto> {
         val data = ArrayList<PointDto>()
@@ -19,11 +19,13 @@ class PlainGraphService : GraphService {
         val engine = mgr.getEngineByName("JS")
         val vars: MutableMap<String, Any?> = HashMap()
         var i: Double = params.from
+        val transpiled = powTranspiler.transpile(params.expression)
         while (i <= params.to) {
             vars[params.varName] = i
-            val y: Double = engine.eval(params.expression, SimpleBindings(vars)) as Double
+            val resY = engine.eval(transpiled, SimpleBindings(vars))
+            val y: Double = if (resY == null) 0.0 else (if (resY is Int) resY.toDouble() else resY as Double)
             data.add(PointDto(i, y))
-            i += params.scale
+            i += params.step
             vars.clear()
         }
         return data
