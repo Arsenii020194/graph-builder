@@ -15,6 +15,22 @@ export default class App extends React.Component {
   onClickSend = (state) => {
     this.setState({...this.state, data:[]})
     let params = {...state}
+    for (let key in params) {
+      if (!params[key]) {
+        store.addNotification({
+          title: 'Error',
+          message: "all settings must be set!",
+          type: 'default',                         // 'default', 'success', 'info', 'warning'
+          container: 'bottom-left',                // where to position the notifications
+          animationIn: ["animated", "fadeIn"],     // animate.css classes that's applied
+          animationOut: ["animated", "fadeOut"],   // animate.css classes that's applied
+          dismiss: {
+            duration: 2000
+          }
+        })
+        return
+      }
+    }
     const requestOptions = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
